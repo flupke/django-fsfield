@@ -40,10 +40,11 @@ The field then acts as a :class:`django.db.models.fields.TextField`::
     >>> obj.field
     'foo'
 
-The model instance must be saved to the database before accessing the field.
+.. note::
+    The model instance must be saved to the database before accessing the field.
 
 You can customize the way data is loaded and saved with the ``load`` and
-``dump`` parameters of the field::
+``dump`` parameters::
 
     from django.db import models
     from django.utils import simplejson as json

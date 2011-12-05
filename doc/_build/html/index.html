@@ -1,0 +1,164 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>django-fsfield &mdash; django-fsfield v0.1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="django-fsfield v0.1 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="#">django-fsfield v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="django-fsfield">
+<h1>django-fsfield<a class="headerlink" href="#django-fsfield" title="Permalink to this headline">¶</a></h1>
+<p>Scalabe file storage fields for your Django models.</p>
+<p>The files are stored on disk by hashing the primary key of the model instance
+that contains the field.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Simply add <a class="reference internal" href="#fsfield.fields.FileStorageField" title="fsfield.fields.FileStorageField"><tt class="xref py py-class docutils literal"><span class="pre">fsfield.fields.FileStorageField</span></tt></a> to your models:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">fsfield</span> <span class="kn">import</span> <span class="n">FileStorageField</span>
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="n">field</span> <span class="o">=</span> <span class="n">FileStorageField</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The field then acts as a <tt class="xref py py-class docutils literal"><span class="pre">django.db.models.fields.TextField</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span><span class="o">.</span><span class="n">field</span> <span class="o">=</span> <span class="s">&quot;foo&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span><span class="o">.</span><span class="n">field</span>
+<span class="go">&#39;foo&#39;</span>
+</pre></div>
+</div>
+<p>The model instance must be saved to the database before accessing the field.</p>
+<p>You can customize the way data is loaded and saved with the <tt class="docutils literal"><span class="pre">load</span></tt> and
+<tt class="docutils literal"><span class="pre">dump</span></tt> parameters of the field:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span> <span class="nn">django.utils</span> <span class="kn">import</span> <span class="n">simplejson</span> <span class="k">as</span> <span class="n">json</span>
+<span class="kn">from</span> <span class="nn">fsfield</span> <span class="kn">import</span> <span class="n">FileStorageField</span>
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+
+    <span class="n">json_field</span> <span class="o">=</span> <span class="n">FileStorageField</span><span class="p">(</span><span class="n">load</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">,</span> <span class="n">dump</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filestoragefield-reference">
+<h2><a class="reference internal" href="#fsfield.fields.FileStorageField" title="fsfield.fields.FileStorageField"><tt class="xref py py-class docutils literal"><span class="pre">FileStorageField</span></tt></a> reference<a class="headerlink" href="#filestoragefield-reference" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fsfield.fields.FileStorageField">
+<em class="property">class </em><tt class="descclassname">fsfield.fields.</tt><tt class="descname">FileStorageField</tt><big>(</big><em>storage=None</em>, <em>load=None</em>, <em>dump=None</em>, <em>default=None</em><big>)</big><a class="reference internal" href="_modules/fsfield/fields.html#FileStorageField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fsfield.fields.FileStorageField" title="Permalink to this definition">¶</a></dt>
+<dd><p>This field type stores string data on the disk, bypassing entirely the
+database.</p>
+<p><em>storage</em> may be a <a class="reference external" href="http://docs.djangoproject.com/en/dev/ref/files/storage/#django.core.files.storage.Storage" title="(in Django v1.3)"><tt class="xref py py-class docutils literal"><span class="pre">django.core.files.storage.Storage</span></tt></a> subclass. The
+<tt class="docutils literal"><span class="pre">FSFIELD_DEFAULT_STORAGE</span></tt> setting is used by default.</p>
+<p>You may specify callables in <em>load</em> and <em>dump</em> to alter the way data is
+loaded from and saved to disk:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">load</span><span class="p">(</span><span class="n">fp</span><span class="p">)</span>
+<span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">fp</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Where <tt class="docutils literal"><span class="pre">fp</span></tt> is a file-like object returned by the storage system.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>FSFIELD_DEFAULT_STORAGE</dt>
+<dd>The default <a class="reference external" href="http://docs.djangoproject.com/en/dev/ref/files/storage/#django.core.files.storage.Storage" title="(in Django v1.3)"><tt class="xref py py-class docutils literal"><span class="pre">django.core.files.storage.Storage</span></tt></a> instance used to
+store files. The default is <tt class="docutils literal"><span class="pre">FileSystemStorage()</span></tt>, storing files in your
+<tt class="docutils literal"><span class="pre">MEDIA_ROOT</span></tt>.</dd>
+<dt>FSFIELD_PATHS_DEPTH</dt>
+<dd>The number of sub paths used to distribute the files in directories. The
+default is 5, which should be sufficient for billions of files.</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">django-fsfield</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#filestoragefield-reference"><tt class="docutils literal"><span class="pre">FileStorageField</span></tt> reference</a></li>
+<li><a class="reference internal" href="#settings">Settings</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="#">django-fsfield v0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Luper Rouch.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.8.
+    </div>
+  </body>
+</html>

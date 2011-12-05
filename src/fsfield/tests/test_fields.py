@@ -23,6 +23,7 @@ class FileStorageFieldTests(SettingsTestCase):
         obj = StorageModel.objects.create()
         self.assertEqual(obj.simple_file_field, None)
         obj.simple_file_field = "foo"
+        obj = StorageModel.objects.get(pk=obj.pk)
         self.assertEqual(obj.simple_file_field, "foo")
         # Field with custom accessors
         obj.json_file_field = {"foo": 12}

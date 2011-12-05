@@ -25,8 +25,8 @@ class FileStorageFieldDescriptor(object):
         if obj is None:
             raise AttributeError("can only be accessed via instances")
         if obj.pk is None:
-            raise ValueError("%s primary key is None, you must save it to "
-                    "the database before accessing this field")
+            raise ValueError("you must save the object the database before "
+                    "accessing this field")
         path = self.path(obj)
         if not self.storage.exists(path):
             return self.default
@@ -39,8 +39,8 @@ class FileStorageFieldDescriptor(object):
         if obj is None:
             raise AttributeError("can only be accessed via instances")
         if obj.pk is None:
-            raise ValueError("%s primary key is None, you must save it to "
-                    "the database before accessing this field")
+            raise ValueError("you must save the object the database before "
+                    "accessing this field")
         path = self.path(obj)
         directory = op.dirname(self.storage.path(path))
         if not op.isdir(directory):
@@ -54,6 +54,21 @@ class FileStorageFieldDescriptor(object):
 
 class FileStorageField(object):
     """
+    This field type stores string data on the disk, bypassing entirely the
+    database.
+
+    *storage* may be a :class:`django.core.files.storage.Storage` subclass. The
+    ``FSFIELD_DEFAULT_STORAGE`` setting is used by default.
+    
+    You may specify callables in *load* and *dump* to alter the way data is
+    loaded from and saved to disk::
+
+        load(fp)
+        dump(data, fp)
+
+    Where ``fp`` is a file-like object returned by the storage system.
+
+    *default* is the value returned when the associated file doesn't exist.
     """
 
     def __init__(self, storage=None, load=None, dump=None, default=None):

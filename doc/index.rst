@@ -1,7 +1,7 @@
 django-fsfield
 ==============
 
-Scalabe file storage fields for your Django models.
+Scalable file storage fields for your Django models.
 
 The files are stored on disk in a tree structure that ensures not too many
 files end up in the same directory, to maintain things fast when the number of

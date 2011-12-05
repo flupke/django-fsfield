@@ -3,8 +3,23 @@ django-fsfield
 
 Scalabe file storage fields for your Django models.
 
-The files are stored on disk by hashing the primary key of the model instance
-that contains the field. 
+The files are stored on disk in a tree structure that ensures not too many
+files end up in the same directory, to maintain things fast when the number of
+files grows. The structure is as follows::
+
+    `~app_name/
+      `~ModelName/
+        `~N/
+          `~W/
+            `~o/
+              `~Z/
+                `~K/
+                  `~NWoZK3kTsExUV00Ywo1G5jlUKKs/
+                    |-field_name
+                    `-other_field_name
+
+Where ``NWoZK3kTsExUV00Ywo1G5jlUKKs`` is a hash made from the model instance's
+primary key.
 
 Usage
 -----
@@ -38,12 +53,18 @@ You can customize the way data is loaded and saved with the ``load`` and
         
         json_field = FileStorageField(load=json.load, dump=json.dump)
 
+``json_field`` can then be used to store JSON data directly::
+
+    >>> obj = MyModel.objects.create()
+    >>> obj.json_field = {"data": 1}
+    >>> obj.json_field
+    {"data": 1}
+
 :class:`~fsfield.fields.FileStorageField` reference
 ---------------------------------------------------
 
 .. autoclass:: fsfield.fields.FileStorageField
     :members:
-
 
 Settings
 --------
@@ -54,6 +75,9 @@ FSFIELD_DEFAULT_STORAGE
     ``MEDIA_ROOT``.
 
 FSFIELD_PATHS_DEPTH
-    The number of sub paths used to distribute the files in directories. The
-    default is 5, which should be sufficient for billions of files.
+    The number of sub paths used to distribute the files in directories.
 
+.. warning::
+    Changing this setting will make old files unreachable. The default of 5
+    should be enough for most uses (average 93 files per directory for 100
+    billion files)

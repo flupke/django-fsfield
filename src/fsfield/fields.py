@@ -57,8 +57,9 @@ class FileStorageField(object):
     This field type stores string data on the disk, bypassing entirely the
     database.
 
-    *storage* may be a :class:`django.core.files.storage.Storage` subclass. The
-    ``FSFIELD_DEFAULT_STORAGE`` setting is used by default.
+    *storage* may be a :class:`django.core.files.storage.Storage` subclass to
+    customize where the files are stored. The ``FSFIELD_DEFAULT_STORAGE``
+    setting is used by default.
     
     You may specify callables in *load* and *dump* to alter the way data is
     loaded from and saved to disk::
@@ -68,7 +69,8 @@ class FileStorageField(object):
 
     Where ``fp`` is a file-like object returned by the storage system.
 
-    *default* is the value returned when the associated file doesn't exist.
+    *default* is the value returned when the file associated to the field
+    doesn't exist.
     """
 
     def __init__(self, storage=None, load=None, dump=None, default=None):

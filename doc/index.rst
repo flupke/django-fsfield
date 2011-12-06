@@ -24,7 +24,7 @@ primary key.
 Usage
 -----
 
-Simply add :class:`fsfield.fields.FileStorageField` to your models::
+Simply add :class:`~fsfield.fields.FileStorageField` to your models::
 
     from django.db import models
     from fsfield import FileStorageField
@@ -41,7 +41,8 @@ The field then acts as a :class:`django.db.models.fields.TextField`::
     'foo'
 
 .. note::
-    The model instance must be saved to the database before accessing the field.
+    the model instance must be saved to the database before accessing the field
+    or an :class:`~exceptions.AttributeError` will be raised.
 
 You can customize the way data is loaded and saved with the ``load`` and
 ``dump`` parameters::
@@ -70,15 +71,19 @@ You can customize the way data is loaded and saved with the ``load`` and
 Settings
 --------
 
-FSFIELD_DEFAULT_STORAGE
-    The default :class:`django.core.files.storage.Storage` instance used to
-    store files. The default is ``FileSystemStorage()``, storing files in your
-    ``MEDIA_ROOT``.
+FSFIELD_DEFAULT_STORAGE_CLASS
+    A string containing the Python path of the
+    :class:`~django.core.files.storage.Storage` class to use. The default is 
+    ``'django.core.files.storage.FileSystemStorage'``.
+
+FSFIELD_DEFAULT_STORAGE_ARGS
+    A tuple containing positional and keyword arguments passed to the storage
+    class constructor. Default is ``((), {})``.
 
 FSFIELD_PATHS_DEPTH
     The number of sub paths used to distribute the files in directories.
 
 .. warning::
-    Changing this setting will make old files unreachable. The default of 5
+    changing this setting will make old files unreachable. The default of 5
     should be enough for most uses (average 93 files per directory for 100
     billion files)

@@ -1,13 +1,12 @@
 import os
 import os.path as op
 from fsfield import settings
-from fsfield.core import hashed_path
+from fsfield.core import model_instance_field_path
 
 
 class FileStorageFieldDescriptor(object):
 
-    def __init__(self, model, name, storage, default, load, dump):
-        self.model = model
+    def __init__(self, name, storage, default, load, dump):
         self.name = name
         self.storage = storage
         self.default = default
@@ -15,11 +14,7 @@ class FileStorageFieldDescriptor(object):
         self.dump = dump
 
     def path(self, obj):
-        return op.join(
-                self.model._meta.app_label,
-                self.model._meta.object_name, 
-                hashed_path(obj.pk, settings.PATHS_DEPTH),
-                self.name)
+        return model_instance_field_path(obj, self.name)
 
     def __get__(self, obj, type=None):
         if obj is None:
@@ -83,6 +78,6 @@ class FileStorageField(object):
         self.default = default
 
     def contribute_to_class(self, cls, name):
-        descriptor = FileStorageFieldDescriptor(cls, name, self.storage,
+        descriptor = FileStorageFieldDescriptor(name, self.storage,
                 self.default, self.load, self.dump)
         setattr(cls, name, descriptor)

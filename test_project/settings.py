@@ -2,7 +2,7 @@ import os.path as op
 import sys
 
 THIS_DIR = op.abspath(op.dirname(__file__))
-sys.path.append(op.join(THIS_DIR, ".."))
+sys.path.append(op.join(THIS_DIR, "..", "src"))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

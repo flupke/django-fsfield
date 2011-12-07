@@ -5,8 +5,7 @@ from django.utils.encoding import force_unicode
 from fsfield import settings
 
 
-# Storage instances
-_storage_cache = {}
+_default_storage = None
 
 
 def path_hash(value):
@@ -33,6 +32,10 @@ def model_instance_field_path(instance, field_name):
     """
     Get the path used to store the Django model *instance* field named
     *field_name*.
+
+    Note that the returned path is a relative path, to get the absolute path,
+    you must pass the value returned by this function to your storage's
+    :meth:`~django.core.files.storage.Storage.path` method.
     """
     return op.join(
         instance._meta.app_label,
@@ -45,10 +48,10 @@ def default_storage():
     """
     Get the default storage instance configured in settings.
     """
-    args, kwargs = settings.DEFAULT_STORAGE_ARGS
-    key = (settings.DEFAULT_STORAGE_CLASS, tuple(args), tuple(kwargs.items()))
-    if key not in _storage_cache:
+    global _default_storage
+    if _default_storage is None:
         module, cls_name = settings.DEFAULT_STORAGE_CLASS.rsplit(".", 1)
+        args, kwargs = settings.DEFAULT_STORAGE_ARGS
         cls = getattr(__import__(module, {}, {}, cls_name), cls_name)
-        _storage_cache[key] = cls(*args, **kwargs)
-    return _storage_cache[key]
+        _default_storage = cls(*args, **kwargs)
+    return _default_storage

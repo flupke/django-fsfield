@@ -17,9 +17,9 @@ class FileStorageFieldDescriptor(object):
 
     def __get__(self, obj, type=None):
         if obj is None:
-            raise AttributeError("can only be accessed via instances")
+            return
         if obj.pk is None:
-            raise ValueError("you must save the object the database before "
+            raise ValueError("you must save the object to the database before "
                     "accessing this field")
         path = self.path(obj)
         if not self.storage.exists(path):
@@ -31,9 +31,9 @@ class FileStorageFieldDescriptor(object):
 
     def __set__(self, obj, value):
         if obj is None:
-            raise AttributeError("can only be accessed via instances")
+            return
         if obj.pk is None:
-            raise ValueError("you must save the object the database before "
+            raise ValueError("you must save the object to the database before "
                     "accessing this field")
         path = self.path(obj)
         directory = op.dirname(self.storage.path(path))
@@ -65,9 +65,13 @@ class FileStorageField(object):
 
     *default* is the value returned when the file associated to the field
     doesn't exist.
+
+    *filename* may be used to customize the name of the files corresponding to
+    this field. The field name is used by default.
     """
 
-    def __init__(self, storage=None, load=None, dump=None, default=None):
+    def __init__(self, storage=None, load=None, dump=None, default=None,
+            filename=None):
         self.load = load
         self.dump = dump
         if storage is None:
@@ -75,8 +79,13 @@ class FileStorageField(object):
         else:
             self.storage = storage
         self.default = default
+        self.filename = filename
 
     def contribute_to_class(self, cls, name):
-        descriptor = FileStorageFieldDescriptor(name, self.storage,
+        if self.filename is not None:
+            filename = self.filename
+        else:
+            filename = name
+        descriptor = FileStorageFieldDescriptor(filename, self.storage,
                 self.default, self.load, self.dump)
         setattr(cls, name, descriptor)

@@ -83,7 +83,9 @@ class FileStorageField(object):
 
     def contribute_to_class(self, cls, name):
         if self.filename is not None:
-            name = self.filename
-        descriptor = FileStorageFieldDescriptor(name, self.storage,
+            filename = self.filename
+        else:
+            filename = name
+        descriptor = FileStorageFieldDescriptor(filename, self.storage,
                 self.default, self.load, self.dump)
         setattr(cls, name, descriptor)

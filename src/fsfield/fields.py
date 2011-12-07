@@ -1,7 +1,6 @@
 import os
 import os.path as op
-from fsfield import settings
-from fsfield.core import model_instance_field_path
+from fsfield.core import model_instance_field_path, default_storage
 
 
 class FileStorageFieldDescriptor(object):
@@ -52,9 +51,9 @@ class FileStorageField(object):
     This field type stores string data on the disk, bypassing entirely the
     database.
 
-    *storage* may be a :class:`django.core.files.storage.Storage` subclass to
-    customize where the files are stored. The ``FSFIELD_DEFAULT_STORAGE``
-    setting is used by default.
+    *storage* may be a :class:`~django.core.files.storage.Storage` subclass to
+    customize where the files are stored. The default storage is used if this
+    is left unspecified.
     
     You may specify callables in *load* and *dump* to alter the way data is
     loaded from and saved to disk::
@@ -72,7 +71,7 @@ class FileStorageField(object):
         self.load = load
         self.dump = dump
         if storage is None:
-            self.storage = settings.DEFAULT_STORAGE
+            self.storage = default_storage()
         else:
             self.storage = storage
         self.default = default

@@ -11,5 +11,5 @@ storage = FileSystemStorage(tmp_dir)
 class StorageModel(models.Model):
 
     normal_field = models.CharField(max_length=255)
-    simple_file_field = FileStorageField(storage)
+    simple_file_field = FileStorageField()
     json_file_field = FileStorageField(storage, load=json.load, dump=json.dump)

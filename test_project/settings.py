@@ -2,7 +2,7 @@ import os.path as op
 import sys
 
 THIS_DIR = op.abspath(op.dirname(__file__))
-sys.path.append(op.join(THIS_DIR, ".."))
+sys.path.insert(0, op.join(THIS_DIR, "..", "src"))
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'fsfield',
+    'django_nose',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -148,3 +149,10 @@ LOGGING = {
         },
     }
 }
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+FSFIELD_DEFAULT_STORAGE_ARGS = (
+    (op.join(THIS_DIR, "..", "src", "fsfield", "tests", "tmp"),), 
+    {}
+)

@@ -17,8 +17,7 @@ class FileStorageFieldDescriptor(object):
 
     def __get__(self, obj, type=None):
         if obj is None:
-            raise AttributeError("the '%s' field can only be accessed via "
-                    "instances" % self.name)
+            return
         if obj.pk is None:
             raise ValueError("you must save the object to the database before "
                     "accessing this field")
@@ -32,8 +31,7 @@ class FileStorageFieldDescriptor(object):
 
     def __set__(self, obj, value):
         if obj is None:
-            raise AttributeError("the '%s' field can only be accessed via "
-                    "instances" % self.name)
+            return
         if obj.pk is None:
             raise ValueError("you must save the object to the database before "
                     "accessing this field")

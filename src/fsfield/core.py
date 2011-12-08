@@ -28,6 +28,17 @@ def hashed_path(value, depth):
     return op.join(*components)
         
 
+def field_path(app_label, model_name, pk, field_name):
+    """
+    Lower level version of :func:`model_instance_field_path`.
+    """
+    return op.join(
+            app_label, 
+            model_name, 
+            hashed_path(pk, settings.PATHS_DEPTH), 
+            field_name)
+
+
 def model_instance_field_path(instance, field_name):
     """
     Get the path used to store the Django model *instance* field named
@@ -37,12 +48,11 @@ def model_instance_field_path(instance, field_name):
     you must pass the value returned by this function to your storage's
     :meth:`~django.core.files.storage.Storage.path` method.
     """
-    return op.join(
-        instance._meta.app_label,
-        instance._meta.object_name, 
-        hashed_path(instance.pk, settings.PATHS_DEPTH),
-        field_name)
-
+    return field_path(
+            instance._meta.app_label,
+            instance._meta.object_name, 
+            instance.pk,
+            field_name)
 
 def default_storage():
     """

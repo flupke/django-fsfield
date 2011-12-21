@@ -1,49 +1,57 @@
 import os
 import os.path as op
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.files.storage import FileSystemStorage
+from django.core.files import locks
 from fsfield.core import model_instance_field_path, default_storage
 
 
 class FileStorageFieldDescriptor(object):
 
-    def __init__(self, name, storage, default, load, dump):
+    def __init__(self, name, filename, storage, default, load, dump):
         self.name = name
+        self.filename = filename
         self.storage = storage
         self.default = default
         self.load = load
         self.dump = dump
 
     def path(self, obj):
-        return model_instance_field_path(obj, self.name)
+        if obj.pk is None:
+            raise AttributeError("you must save the object to the database "
+                    "before accessing this field")
+        return model_instance_field_path(obj, self.filename)
 
     def __get__(self, obj, type=None):
         if obj is None:
             return
-        if obj.pk is None:
-            raise ValueError("you must save the object to the database before "
-                    "accessing this field")
-        path = self.path(obj)
-        if not self.storage.exists(path):
-            return self.default
-        fp = self.storage.open(path, "rb")
-        if self.load is not None:
-            return self.load(fp)
-        return fp.read()
+        if self.name not in obj.__dict__:
+            # Load data from disk
+            path = self.path(obj)
+            if not self.storage.exists(path):
+                value = self.default
+            else:
+                # Open the file for reading and acquire a lock on it if
+                # possible
+                fp = self.storage.open(path, "r+b")
+                if isinstance(self.storage, FileSystemStorage):
+                    locks.lock(fp.file, locks.LOCK_EX)
+                try:
+                    # Read file content
+                    if self.load is not None:
+                        value = self.load(fp)
+                    else:
+                        value = fp.read().decode("utf8")
+                finally:
+                    # Release lock
+                    if isinstance(self.storage, FileSystemStorage):
+                        locks.unlock(fp.file)
+            obj.__dict__[self.name] = value
+        return obj.__dict__[self.name]
 
     def __set__(self, obj, value):
-        if obj is None:
-            return
-        if obj.pk is None:
-            raise ValueError("you must save the object to the database before "
-                    "accessing this field")
-        path = self.path(obj)
-        directory = op.dirname(self.storage.path(path))
-        if not op.isdir(directory):
-            os.makedirs(directory)
-        fp = self.storage.open(path, "wb")
-        if self.dump is not None:
-            self.dump(value, fp)
-        else:
-            fp.write(value)
+        obj.__dict__[self.name] = value
 
 
 class FileStorageField(object):
@@ -86,6 +94,41 @@ class FileStorageField(object):
             filename = self.filename
         else:
             filename = name
-        descriptor = FileStorageFieldDescriptor(filename, self.storage,
+
+        # Create a post_save signal handler to write data to disk 
+        @receiver(post_save, sender=cls, weak=False,
+                dispatch_uid="fsfield_write_data_%s_%s_%s" % 
+                (cls.__module__, cls.__name__, name))
+        def write_data(sender, instance, created, raw, using, **kwargs):
+            if (name not in instance.__dict__ or
+                    instance.__dict__[name] is None):
+                # Nothing to save
+                return
+            # Open the file for writing and acquire a lock on it if
+            # possible
+            path = model_instance_field_path(instance, filename)
+            fs_storage = isinstance(self.storage, FileSystemStorage)
+            if fs_storage:
+                full_path = self.storage.path(path)
+                directory = op.dirname(full_path)
+                if not op.exists(directory):
+                    os.makedirs(directory)
+            fp = self.storage.open(path, "wb")
+            if fs_storage:
+                locks.lock(fp.file, locks.LOCK_EX)
+            # Write data
+            try:
+                value = instance.__dict__[name]
+                if self.dump is None:
+                    fp.write(value.encode("utf8"))
+                else:
+                    self.dump(value, fp)
+            finally:
+                # Release lock
+                if fs_storage:
+                    locks.unlock(fp.file)
+
+        # Install field descriptor
+        descriptor = FileStorageFieldDescriptor(name, filename, self.storage,
                 self.default, self.load, self.dump)
         setattr(cls, name, descriptor)

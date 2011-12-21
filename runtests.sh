@@ -1,2 +1,2 @@
-cd test_project
-./manage.py test fsfield --with-coverage --cover-package=fsfield $@
+coverage run --source fsfield test_project/manage.py test fsfield
+coverage report --omit="src/fsfield/tests*" 

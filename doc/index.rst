@@ -37,12 +37,10 @@ The field then acts as a :class:`django.db.models.fields.TextField`::
 
     >>> obj = MyModel.objects.create()
     >>> obj.field = "foo"
+    >>> obj.save()
+    >>> obj = MyModel.objects.get(pk=obj.pk)
     >>> obj.field
     'foo'
-
-.. note::
-    the model instance must be saved to the database before accessing the field
-    or an :class:`~exceptions.AttributeError` will be raised.
 
 You can customize the way data is loaded and saved with the ``load`` and
 ``dump`` parameters::

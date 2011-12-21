@@ -149,8 +149,3 @@ LOGGING = {
         },
     }
 }
-
-FSFIELD_DEFAULT_STORAGE_ARGS = (
-    (op.join(THIS_DIR, "..", "src", "fsfield", "tests", "tmp"),), 
-    {}
-)

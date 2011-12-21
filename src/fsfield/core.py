@@ -54,6 +54,7 @@ def model_instance_field_path(instance, field_name):
             instance.pk,
             field_name)
 
+
 def default_storage():
     """
     Get the default storage instance configured in settings.

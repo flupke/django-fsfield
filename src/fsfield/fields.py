@@ -112,7 +112,13 @@ class FileStorageField(object):
                 full_path = self.storage.path(path)
                 directory = op.dirname(full_path)
                 if not op.exists(directory):
-                    os.makedirs(directory)
+                    try:
+                        os.makedirs(directory)
+                    except OSError, err:
+                        # Another thread may have created the directory since
+                        # the check
+                        if err.errno == 17:
+                            pass
             fp = self.storage.open(path, "wb")
             if fs_storage:
                 locks.lock(fp.file, locks.LOCK_EX)

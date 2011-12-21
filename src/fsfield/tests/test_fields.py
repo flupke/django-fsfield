@@ -3,7 +3,8 @@ import shutil
 from django.conf import settings
 from fsfield.tests.base import SettingsTestCase
 from fsfield.tests.models import StorageModel
-from fsfield.core import model_instance_field_path, default_storage
+from fsfield.core import model_instance_field_path
+from fsfield.tests.models import storage
 
 
 tmp_dir = op.join(op.dirname(__file__), "tmp")
@@ -45,7 +46,6 @@ class FileStorageFieldTests(SettingsTestCase):
         obj = StorageModel.objects.create()
         obj.custom_name_file_field = "flap"
         obj.save()
-        storage = default_storage()
         path = storage.path(model_instance_field_path(obj, "custom"))
         self.assertEqual(op.exists(path), True)
         self.assertEqual(open(path).read(), "flap")

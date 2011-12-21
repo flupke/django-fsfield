@@ -14,4 +14,3 @@ class CoreTests(TestCase):
     def test_hashed_path(self):
         self.assertEqual(hashed_path(1, 3), 
                 op.join("N", "W", "o", "NWoZK3kTsExUV00Ywo1G5jlUKKs"))
-

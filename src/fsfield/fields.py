@@ -47,6 +47,8 @@ class FileStorageFieldDescriptor(object):
                     # Release lock
                     if isinstance(self.storage, FileSystemStorage):
                         locks.unlock(fp.file)
+                    # Close file
+                    fp.close()
             obj.__dict__[self.name] = value
         return obj.__dict__[self.name]
 
@@ -133,6 +135,8 @@ class FileStorageField(object):
                 # Release lock
                 if fs_storage:
                     locks.unlock(fp.file)
+                # Close file
+                fp.close()
 
         # Install field descriptor
         descriptor = FileStorageFieldDescriptor(name, filename, self.storage,

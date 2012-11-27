@@ -13,7 +13,7 @@ tmp_dir = op.join(op.dirname(__file__), "tmp")
 class FileStorageFieldTests(SettingsTestCase):
 
     def setUp(self):
-        new_apps = settings.INSTALLED_APPS + ["fsfield.tests"]
+        new_apps = list(settings.INSTALLED_APPS) + ["fsfield.tests"]
         self.settings_manager.set(
             INSTALLED_APPS=new_apps,
         )
